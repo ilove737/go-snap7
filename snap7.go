@@ -166,16 +166,68 @@ func (Client C.S7Object) Cli_CTWrite(Start, Amount int, pUsrData unsafe.Pointer)
 // System Info functions
 // int S7API Cli_GetOrderCode(S7Object Client, TS7OrderCode *pUsrData);
 // int S7API Cli_GetCpuInfo(S7Object Client, TS7CpuInfo *pUsrData);
-func (Client C.S7Object) Cli_GetCpuInfo() (Info C.TS7CpuInfo) {
+type CpuInfo struct {
+	ModuleTypeName string
+	SerialNumber   string
+	ASName         string
+	Copyright      string
+	ModuleName     string
+}
+
+func (Client C.S7Object) Cli_GetCpuInfo() CpuInfo {
+	var Info C.TS7CpuInfo
+	var ret CpuInfo
 	C.Cli_GetCpuInfo(Client, &Info)
 	// if (Check(res,"Unit Info"))
-	// {
-	fmt.Println("  Module Type Name :", (Info.ModuleTypeName))
-	fmt.Println("  Seriel Number    :", Info.SerialNumber)
-	fmt.Println("  AS Name          :", Info.ASName)
-	fmt.Println("  Module Name      :", Info.ModuleName)
 
-	return
+	type cpuInfo struct {
+		ModuleTypeName [33]byte
+		SerialNumber   [25]byte
+		ASName         [25]byte
+		Copyright      [27]byte
+		ModuleName     [25]byte
+	}
+	info := (*cpuInfo)(unsafe.Pointer(&Info))
+
+	var str []byte
+
+	for _, v := range info.ModuleTypeName {
+		str = append(str, v)
+	}
+	ret.ModuleTypeName = string(str)
+	str = []byte{}
+
+	for _, v := range info.SerialNumber {
+		str = append(str, v)
+	}
+	ret.SerialNumber = string(str)
+	str = []byte{}
+
+	for _, v := range info.Copyright {
+		str = append(str, v)
+	}
+	ret.Copyright = string(str)
+	str = []byte{}
+
+	for _, v := range info.ASName {
+		str = append(str, v)
+	}
+	ret.ASName = string(str)
+	str = []byte{}
+
+	for _, v := range info.ModuleName {
+		str = append(str, v)
+	}
+	ret.ModuleName = string(str)
+	str = []byte{}
+
+	fmt.Println("  Module Type Name :", ret.ModuleTypeName)
+	fmt.Println("  Seriel Number    :", ret.SerialNumber)
+	fmt.Println("  Copyright        :", ret.Copyright)
+	fmt.Println("  AS Name          :", ret.ASName)
+	fmt.Println("  Module Name      :", ret.ModuleName)
+
+	return ret
 }
 
 // int S7API Cli_GetCpInfo(S7Object Client, TS7CpInfo *pUsrData);
