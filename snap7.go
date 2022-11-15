@@ -49,13 +49,17 @@ func (Client C.S7Object) Cli_Disconnect() {
 }
 
 // int S7API Cli_GetParam(S7Object Client, int ParamNumber, void *pValue);
-func (Client C.S7Object) Cli_GetParam(ParamNumber int, pValue unsafe.Pointer) {
-	C.Cli_GetParam(Client, C.int(ParamNumber), pValue)
+func (Client C.S7Object) Cli_GetParam(ParamNumber int) [2048]byte {
+	var data [2048]byte
+	ParamData := unsafe.Pointer(&data)
+	C.Cli_GetParam(Client, C.int(ParamNumber), ParamData)
+	return data
 }
 
 // int S7API Cli_SetParam(S7Object Client, int ParamNumber, void *pValue);
-func (Client C.S7Object) Cli_SetParam(ParamNumber int, pValue unsafe.Pointer) {
-	C.Cli_SetParam(Client, C.int(ParamNumber), pValue)
+func (Client C.S7Object) Cli_SetParam(ParamNumber int, pwr []byte) {
+	ParamData := unsafe.Pointer(&pwr)
+	C.Cli_SetParam(Client, C.int(ParamNumber), ParamData)
 }
 
 // int S7API Cli_SetAsCallback(S7Object Client, pfn_CliCompletion pCompletion, void *usrPtr);
@@ -105,42 +109,74 @@ func (Client C.S7Object) Cli_MBWrite(Start, Size int, wr []byte) {
 }
 
 // int S7API Cli_EBRead(S7Object Client, int Start, int Size, void *pUsrData);
-func (Client C.S7Object) Cli_EBRead(Start, Size int, pUsrData unsafe.Pointer) {
+func (Client C.S7Object) Cli_EBRead(Start, Size int) []byte {
+	var data [2048]byte
+	pUsrData := unsafe.Pointer(&data)
 	C.Cli_EBRead(Client, C.int(Start), C.int(Size), pUsrData)
+	return data[0:Size]
 }
 
 // int S7API Cli_EBWrite(S7Object Client, int Start, int Size, void *pUsrData);
-func (Client C.S7Object) Cli_EBWrite(Start, Size int, pUsrData unsafe.Pointer) {
+func (Client C.S7Object) Cli_EBWrite(Start, Size int, wr []byte) {
+	var wdata [2048]byte
+	for i := 0; i < int(Size); i++ {
+		wdata[i] = wr[i]
+	}
+	pUsrData := unsafe.Pointer(&wdata)
 	C.Cli_EBWrite(Client, C.int(Start), C.int(Size), pUsrData)
 }
 
 // int S7API Cli_ABRead(S7Object Client, int Start, int Size, void *pUsrData);
-func (Client C.S7Object) Cli_ABRead(Start, Size int, pUsrData unsafe.Pointer) {
+func (Client C.S7Object) Cli_ABRead(Start, Size int) []byte {
+	var data [2048]byte
+	pUsrData := unsafe.Pointer(&data)
 	C.Cli_ABRead(Client, C.int(Start), C.int(Size), pUsrData)
+	return data[0:Size]
 }
 
 // int S7API Cli_ABWrite(S7Object Client, int Start, int Size, void *pUsrData);
-func (Client C.S7Object) Cli_ABWrite(Start, Size int, pUsrData unsafe.Pointer) {
+func (Client C.S7Object) Cli_ABWrite(Start, Size int, wr []byte) {
+	var wdata [2048]byte
+	for i := 0; i < int(Size); i++ {
+		wdata[i] = wr[i]
+	}
+	pUsrData := unsafe.Pointer(&wdata)
 	C.Cli_ABWrite(Client, C.int(Start), C.int(Size), pUsrData)
 }
 
 // int S7API Cli_TMRead(S7Object Client, int Start, int Amount, void *pUsrData);
-func (Client C.S7Object) Cli_TMRead(Start, Amount int, pUsrData unsafe.Pointer) {
+func (Client C.S7Object) Cli_TMRead(Start, Amount int) []byte {
+	var data [2048]byte
+	pUsrData := unsafe.Pointer(&data)
 	C.Cli_TMRead(Client, C.int(Start), C.int(Amount), pUsrData)
+	return data[0:Amount]
 }
 
 // int S7API Cli_TMWrite(S7Object Client, int Start, int Amount, void *pUsrData);
-func (Client C.S7Object) Cli_TMWrite(Start, Amount int, pUsrData unsafe.Pointer) {
+func (Client C.S7Object) Cli_TMWrite(Start, Amount int, wr []byte) {
+	var wdata [2048]byte
+	for i := 0; i < int(Amount); i++ {
+		wdata[i] = wr[i]
+	}
+	pUsrData := unsafe.Pointer(&wdata)
 	C.Cli_TMWrite(Client, C.int(Start), C.int(Amount), pUsrData)
 }
 
 // int S7API Cli_CTRead(S7Object Client, int Start, int Amount, void *pUsrData);
-func (Client C.S7Object) Cli_CTRead(Start, Amount int, pUsrData unsafe.Pointer) {
+func (Client C.S7Object) Cli_CTRead(Start, Amount int) []byte {
+	var data [2048]byte
+	pUsrData := unsafe.Pointer(&data)
 	C.Cli_CTRead(Client, C.int(Start), C.int(Amount), pUsrData)
+	return data[0:Amount]
 }
 
 // int S7API Cli_CTWrite(S7Object Client, int Start, int Amount, void *pUsrData);
-func (Client C.S7Object) Cli_CTWrite(Start, Amount int, pUsrData unsafe.Pointer) {
+func (Client C.S7Object) Cli_CTWrite(Start, Amount int, wr []byte) {
+	var wdata [2048]byte
+	for i := 0; i < int(Amount); i++ {
+		wdata[i] = wr[i]
+	}
+	pUsrData := unsafe.Pointer(&wdata)
 	C.Cli_CTWrite(Client, C.int(Start), C.int(Amount), pUsrData)
 }
 
